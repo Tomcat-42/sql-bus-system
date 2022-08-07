@@ -1,0 +1,2 @@
+#!/bin/env bash
+docker exec -i db /bin/bash -c "PGPASSWORD=postgres pg_dump --username postgres $1" >"$2"
