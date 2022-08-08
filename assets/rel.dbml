@@ -20,7 +20,7 @@ Enum PassageiroPreferencial_tipo {
   deficiente [note: "Passageiro deficiente"]
 }
 
-Enum PassageiroPreferencial_periodo {
+Enum PassageiroEstudante_periodo {
   matutino [note: "Turno pela manhã"]
   vespertino [note: "Turno pela tarde"]
   noturno [note: "Turno pela noite"]
@@ -43,9 +43,14 @@ Enum FuncionarioLimpeza_tipo {
 // ========================= Entidades Base ===================================
 Table Localizacao {
   id int [pk, increment, unique, not null, note: "Identificador de localização"]
-  latitute text [not null, note: "String contendo a latitude da localização"]
+  latitude text [not null, note: "String contendo a latitude da localização"]
   longitude text [not null, note: "String contendo a longitude da localização."]
   note: "Uma localização genérica"
+
+  Indexes {
+    (latitude, longitude) [name: 'Localizacao_index']
+    id [unique]
+  }
 }
 
 Table Rota {
@@ -60,6 +65,10 @@ Table Onibus {
   modelo text [note: "Modelo do ônibus"]
   status Onibus_status [note: "Status do ônibus"]
   note: "Ônibus em posse da empresa"
+
+  Indexes {
+    id [unique]
+  }
 }
 
 Table Ponto {
@@ -67,6 +76,10 @@ Table Ponto {
   nome text [note: "Nome do ponto"]
   caixa float [note: "Quantidade em caixa do ponto"]
   note: "Pontos de ônibus por onde o ônibus passa"
+
+  Indexes {
+    id [unique]
+  }
 }
 
 Table Passageiro {
@@ -84,7 +97,7 @@ Table PassageiroPreferencial {
 Table PassageiroEstudante {
   id int [ref: - Passageiro.id, note: "Identificador de passageiro"]
   desconto float [note: "Desconto obtido com o benefício de estudante"]
-  periodo PassageiroPreferencial_periodo [note: "Período em que o passageiro pode usar o benefício"]
+  periodo PassageiroEstudante_periodo [note: "Período em que o passageiro pode usar o benefício"]
   instituicao text [note: "Nome da instituição em que o passageiro está matriculado"]
   note: "Passageiro que está matriculado em instituição de ensino"
 }
@@ -101,7 +114,7 @@ Table Endereco {
 Table Pessoa {
   id int [increment, pk, unique, not null, note: "Identificador de pessoa"]
   nome text [note: "Nome da pessoa"]
-  telefone varchar1 [unique, note: "String com o Telefone da pessoa, restrito à apenas um telefone por pessoa"]
+  telefone varchar [unique, note: "String com o Telefone da pessoa, restrito à apenas um telefone por pessoa"]
   rg text [not null, unique, note: "String com o RG da pessoa"]
   cpf text [not null, unique, note: "String com o CPF da pessoa"]
   note: "Entidade de identificação de uma pessoa"
@@ -114,19 +127,19 @@ Table Funcionario {
 }
 
 Table FuncionarioMotorista {
-  id int [ref: - Funcionario.id, note: "Identificador de funcionário"]
+  id int [unique, pk, ref: - Funcionario.id, note: "Identificador de funcionário"]
   cnh text [not null, unique, note: "String com a CNH do motorista"]
   note: "Motoristas que trabalham na empresa de transporte"
 }
 
 Table FuncionarioCobrador {
-  id int [ref: - Funcionario.id, note: "Identificador de funcionário"]
+  id int [unique, pk, ref: - Funcionario.id, note: "Identificador de funcionário"]
   tipo FuncionarioCobrador_tipo [note: "Tipo de cobrador, se é fixo em um ponto ou fica no ônibus"]
   note: "Cobradores que trabalham na empresa de transporte"
 }
 
 Table FuncionarioLimpeza {
-  id int [ref: - Funcionario.id, note: "Identificador de funcionário"]
+  id int [unique, pk, ref: - Funcionario.id, note: "Identificador de funcionário"]
   empresa text [not null, note: "Empresa terceirizada pelo qual funcionários de limpeza trabalham"]
   tipo FuncionarioLimpeza_tipo [note: "Tipo de limpeza, no ônibus ou no terminal"]
   note: "Funcionários de Limpeza que trabalham na empresa de transporte"
@@ -140,21 +153,33 @@ Table FuncionarioLimpeza {
 Table RotaLocalizacaoInicial {
   id_rota int [ref: - Rota.id, note: "Identificador de rota"]
   id_localizacao int [ref: - Localizacao.id, note: "Identificador de localização"]
+   Indexes {
+    (id_rota, id_localizacao) [name: 'RotaLocalizacaoInicial_index']
+  }
 }
 
 Table RotaLocalizacaoFinal {
   id_rota int [ref: - Rota.id, note: "Identificador de rota"]
   id_localizacao int [ref: - Localizacao.id, note: "Identificador de localização"]
+  Indexes {
+    (id_rota, id_localizacao) [name: 'RotaLocalizacaoFinal_index']
+  }
 }
 
 Table LocalizacaoPonto {
   id_localizacao int [ref: - Localizacao.id, note: "Identificador de localização"]
   id_ponto int [ref: - Ponto.id, note: "Identificador de ponto"]
+   Indexes {
+    (id_localizacao, id_ponto) [name: 'Localizacao_Ponto_index']
+  }
 }
 
 Table LocalizacaoOnibus {
   id_localizacao int [ref: - Localizacao.id, note: "Identificador de localização"]
   id_onibus int [ref: - Onibus.id, note: "Identificador de ônibus"]
+  Indexes {
+    (id_localizacao, id_onibus) [name: 'Localizacao_Onibus_index']
+  }
 }
 
 Table OnibusPassageiro {
@@ -168,7 +193,7 @@ Table PassageiroPessoa {
 }
 
 Table MotoristaOnibus {
-  id_motorisa int [ref: - FuncionarioMotorista.id, note: "Identificador de motorista"]
+  id_motorista int [ref: - FuncionarioMotorista.id, note: "Identificador de motorista"]
   id_onibus int [ref: - Onibus.id, note: "Identificador de ônibus"]
 }
 
@@ -184,7 +209,11 @@ Table PontoEndereco {
 
 Table RotaPonto {
   id_rota int [ref: - Rota.id, note: "Identificador de rota"]
-  id_endereco int [ref: - Endereco.id, note: "Identificador de endereço"]
+  id_ponto int [ref: - Ponto.id, note: "Identificador do ponto"]
+
+  Indexes {
+    (id_rota, id_ponto) [name: 'RotaPonto_index']
+  }
 }
 
 Table CobradorOnibus {
