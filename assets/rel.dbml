@@ -1,0 +1,208 @@
+Project BusSystem {
+  database_type: 'PostgreSQL'
+  Note: '''
+    # Bus System Database
+    Simple SQL model for a public transport system
+  '''
+}
+
+
+// ========================= Enums ===========================================
+Enum Onibus_status {
+  operante [note: "O Onibus esta ativo"]
+  inativo [note: "O Onibus esta inativo"]
+  manutencao [note: "O Onibus esta em manutencao"]
+}
+
+Enum PassageiroPreferencial_tipo {
+  idoso [note: "Passageiro idoso"]
+  gestante [note: "Passageiro gestante"]
+  deficiente [note: "Passageiro deficiente"]
+}
+
+Enum PassageiroPreferencial_periodo {
+  matutino [note: "Turno pela manhã"]
+  vespertino [note: "Turno pela tarde"]
+  noturno [note: "Turno pela noite"]
+  integral [note: "Turno integral"]
+}
+
+Enum FuncionarioCobrador_tipo {
+  ponto [note: "Cobrador fixo em um terminal"]
+  onibus [note: "Cobrador dentro do ônibus"]
+}
+
+Enum FuncionarioLimpeza_tipo {
+  ponto [note: "Limpeza do terminal"]
+  onibus [note: "Limpeza do ônibus"]
+}
+
+
+
+
+// ========================= Entidades Base ===================================
+Table Localizacao {
+  id int [pk, increment, unique, not null, note: "Identificador de localização"]
+  latitute text [not null, note: "String contendo a latitude da localização"]
+  longitude text [not null, note: "String contendo a longitude da localização."]
+  note: "Uma localização genérica"
+}
+
+Table Rota {
+  id int [pk, increment, unique, not null, note: "Identificador de rota"]
+  nome text [note: "Nome da rota"]
+  note: "Rotas realizadas pelos ônibus"
+}
+
+Table Onibus {
+  id int [pk, increment, unique, not null, note: "Identificador de ônibus"]
+  marca text [note: "Marca do ônibus"]
+  modelo text [note: "Modelo do ônibus"]
+  status Onibus_status [note: "Status do ônibus"]
+  note: "Ônibus em posse da empresa"
+}
+
+Table Ponto {
+  id int [pk, increment, unique, not null, note: "Identificador de ponto"]
+  nome text [note: "Nome do ponto"]
+  caixa float [note: "Quantidade em caixa do ponto"]
+  note: "Pontos de ônibus por onde o ônibus passa"
+}
+
+Table Passageiro {
+  id int [pk, increment, unique, not null, note: "Identificador de passageiro"]
+  saldo float [note: "Saldo de passagens do passageiro"]
+  note: "Passageiro que utiliza o transporte público"
+}
+
+Table PassageiroPreferencial {
+  id int [ref: - Passageiro.id, note: "Identificador de passageiro"]
+  tipo PassageiroPreferencial_tipo [not null, note: "Tipo de preferência do passageiro"]
+  note: "Passageiros que possuem algum tipo de preferência pela lei"
+}
+
+Table PassageiroEstudante {
+  id int [ref: - Passageiro.id, note: "Identificador de passageiro"]
+  desconto float [note: "Desconto obtido com o benefício de estudante"]
+  periodo PassageiroPreferencial_periodo [note: "Período em que o passageiro pode usar o benefício"]
+  instituicao text [note: "Nome da instituição em que o passageiro está matriculado"]
+  note: "Passageiro que está matriculado em instituição de ensino"
+}
+
+Table Endereco {
+  id int [increment, pk, unique, not null, note: "Identificador de endereço"]
+  rua text [note: "Nome da rua"]
+  cidade text [note: "Nome da cidade"]
+  bairro text [note: "Nome do bairro"]
+  numero int [note: "Número do endereço"]
+  note: "Endereço de pessoas ou pontos"
+}
+
+Table Pessoa {
+  id int [increment, pk, unique, not null, note: "Identificador de pessoa"]
+  nome text [note: "Nome da pessoa"]
+  telefone varchar1 [unique, note: "String com o Telefone da pessoa, restrito à apenas um telefone por pessoa"]
+  rg text [not null, unique, note: "String com o RG da pessoa"]
+  cpf text [not null, unique, note: "String com o CPF da pessoa"]
+  note: "Entidade de identificação de uma pessoa"
+}
+
+Table Funcionario {
+  id int [pk, unique, increment, not null, note: "Identificador de funcionario"]
+  carga_horaria int [not null, note: "Carga horária de um funcionário da empresa"]
+  note: "Funcionário que trabalha para a empresa de transporte"
+}
+
+Table FuncionarioMotorista {
+  id int [ref: - Funcionario.id, note: "Identificador de funcionário"]
+  cnh text [not null, unique, note: "String com a CNH do motorista"]
+  note: "Motoristas que trabalham na empresa de transporte"
+}
+
+Table FuncionarioCobrador {
+  id int [ref: - Funcionario.id, note: "Identificador de funcionário"]
+  tipo FuncionarioCobrador_tipo [note: "Tipo de cobrador, se é fixo em um ponto ou fica no ônibus"]
+  note: "Cobradores que trabalham na empresa de transporte"
+}
+
+Table FuncionarioLimpeza {
+  id int [ref: - Funcionario.id, note: "Identificador de funcionário"]
+  empresa text [not null, note: "Empresa terceirizada pelo qual funcionários de limpeza trabalham"]
+  tipo FuncionarioLimpeza_tipo [note: "Tipo de limpeza, no ônibus ou no terminal"]
+  note: "Funcionários de Limpeza que trabalham na empresa de transporte"
+}
+
+
+
+
+
+// ========================= Relacionamentos ===================================
+Table RotaLocalizacaoInicial {
+  id_rota int [ref: - Rota.id, note: "Identificador de rota"]
+  id_localizacao int [ref: - Localizacao.id, note: "Identificador de localização"]
+}
+
+Table RotaLocalizacaoFinal {
+  id_rota int [ref: - Rota.id, note: "Identificador de rota"]
+  id_localizacao int [ref: - Localizacao.id, note: "Identificador de localização"]
+}
+
+Table LocalizacaoPonto {
+  id_localizacao int [ref: - Localizacao.id, note: "Identificador de localização"]
+  id_ponto int [ref: - Ponto.id, note: "Identificador de ponto"]
+}
+
+Table LocalizacaoOnibus {
+  id_localizacao int [ref: - Localizacao.id, note: "Identificador de localização"]
+  id_onibus int [ref: - Onibus.id, note: "Identificador de ônibus"]
+}
+
+Table OnibusPassageiro {
+  id_onibus int [ref: - Onibus.id, note: "Identificador de ônibus"]
+  id_passageiro int [ref: - Passageiro.id, note: "Identificador de passageiro"]
+}
+
+Table PassageiroPessoa {
+  id_passageiro int [ref: - Passageiro.id, note: "Identificador de passageiro"]
+  id_pessoa int [ref: - Pessoa.id, note: "Identificador de pessoa"]
+}
+
+Table MotoristaOnibus {
+  id_motorisa int [ref: - FuncionarioMotorista.id, note: "Identificador de motorista"]
+  id_onibus int [ref: - Onibus.id, note: "Identificador de ônibus"]
+}
+
+Table PontoOnibus {
+  id_ponto int [ref: - Ponto.id, note: "Identificador de ponto"]
+  id_onibus int [ref: - Onibus.id, note: "Identificador de ônibus"]
+}
+
+Table PontoEndereco {
+  id_ponto int [ref: - Ponto.id, note: "Identificador de ponto"]
+  id_endereco int [ref: - Endereco.id, note: "Identificador de endereço"]
+}
+
+Table RotaPonto {
+  id_rota int [ref: - Rota.id, note: "Identificador de rota"]
+  id_endereco int [ref: - Endereco.id, note: "Identificador de endereço"]
+}
+
+Table CobradorOnibus {
+  id_cobrador int [ref: - FuncionarioCobrador.id, note: "Identificador de cobrador"]
+  id_onibus int [ref: - Onibus.id, note: "Identificador de ônibus"]
+}
+
+Table CobradorPonto {
+  id_cobrador int [ref: - FuncionarioCobrador.id, note: "Identificador de cobrador"]
+  id_ponto int [ref: - Ponto.id, note: "Identificador de ponto"]
+}
+
+Table FuncionarioEndereco {
+  id_funcionario int [ref: - Funcionario.id, note: "Identificador de funcionário"]
+  id_endereco int [ref: - Endereco.id, note: "Identificador de endereço"]
+}
+
+Table FuncionarioPessoa {
+  id_funcionario int [ref: - Funcionario.id, note: "Identificador de funcionário"]
+  id_pessoa int [ref: - Pessoa.id, note: "Identificador de pessoa"]
+}
