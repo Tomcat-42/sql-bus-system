@@ -153,6 +153,7 @@ Table FuncionarioLimpeza {
 Table RotaLocalizacaoInicial {
   id_rota int [ref: - Rota.id, note: "Identificador de rota"]
   id_localizacao int [ref: - Localizacao.id, note: "Identificador de localização"]
+  note: "Relacionamento que representa a localização inicial de uma rota"
    Indexes {
     (id_rota, id_localizacao) [name: 'RotaLocalizacaoInicial_index']
   }
@@ -161,6 +162,7 @@ Table RotaLocalizacaoInicial {
 Table RotaLocalizacaoFinal {
   id_rota int [ref: - Rota.id, note: "Identificador de rota"]
   id_localizacao int [ref: - Localizacao.id, note: "Identificador de localização"]
+  note: "Relacionamento que representa a localização final de uma rota"
   Indexes {
     (id_rota, id_localizacao) [name: 'RotaLocalizacaoFinal_index']
   }
@@ -169,6 +171,7 @@ Table RotaLocalizacaoFinal {
 Table LocalizacaoPonto {
   id_localizacao int [ref: - Localizacao.id, note: "Identificador de localização"]
   id_ponto int [ref: - Ponto.id, note: "Identificador de ponto"]
+  note: "Relacionamento que representa a localização de um ponto"
    Indexes {
     (id_localizacao, id_ponto) [name: 'Localizacao_Ponto_index']
   }
@@ -177,6 +180,7 @@ Table LocalizacaoPonto {
 Table LocalizacaoOnibus {
   id_localizacao int [ref: - Localizacao.id, note: "Identificador de localização"]
   id_onibus int [ref: - Onibus.id, note: "Identificador de ônibus"]
+  note: "Relacionamento que representa a localização de um ônibus"
   Indexes {
     (id_localizacao, id_onibus) [name: 'Localizacao_Onibus_index']
   }
@@ -185,31 +189,37 @@ Table LocalizacaoOnibus {
 Table OnibusPassageiro {
   id_onibus int [ref: - Onibus.id, note: "Identificador de ônibus"]
   id_passageiro int [ref: - Passageiro.id, note: "Identificador de passageiro"]
+  note: "Relacionamento que representa os passageiros que estão em um ônibus"
 }
 
 Table PassageiroPessoa {
   id_passageiro int [ref: - Passageiro.id, note: "Identificador de passageiro"]
   id_pessoa int [ref: - Pessoa.id, note: "Identificador de pessoa"]
+  note: "Relacionamento que representa as identificações de uma pessoa que seja passageiro"
 }
 
 Table MotoristaOnibus {
   id_motorista int [ref: - FuncionarioMotorista.id, note: "Identificador de motorista"]
   id_onibus int [ref: - Onibus.id, note: "Identificador de ônibus"]
+  note: "Relacionamento que representa o motorista de um ônibus"
 }
 
 Table PontoOnibus {
   id_ponto int [ref: - Ponto.id, note: "Identificador de ponto"]
   id_onibus int [ref: - Onibus.id, note: "Identificador de ônibus"]
+  note: "Relacionamento que representa os ônibus que estão em um ponto"
 }
 
 Table PontoEndereco {
   id_ponto int [ref: - Ponto.id, note: "Identificador de ponto"]
   id_endereco int [ref: - Endereco.id, note: "Identificador de endereço"]
+  note: "Relacionamento que representa o endereço de um ponto"
 }
 
 Table RotaPonto {
   id_rota int [ref: - Rota.id, note: "Identificador de rota"]
   id_ponto int [ref: - Ponto.id, note: "Identificador do ponto"]
+  note: "Relacionamento que representa os pontos de uma rota"
 
   Indexes {
     (id_rota, id_ponto) [name: 'RotaPonto_index']
@@ -219,19 +229,23 @@ Table RotaPonto {
 Table CobradorOnibus {
   id_cobrador int [ref: - FuncionarioCobrador.id, note: "Identificador de cobrador"]
   id_onibus int [ref: - Onibus.id, note: "Identificador de ônibus"]
+  note: "Relacionamento que representa o cobrador de um ônibus"
 }
 
 Table CobradorPonto {
   id_cobrador int [ref: - FuncionarioCobrador.id, note: "Identificador de cobrador"]
   id_ponto int [ref: - Ponto.id, note: "Identificador de ponto"]
+  note: "Relacionamento que representa o cobrador de um ponto"
 }
 
 Table FuncionarioEndereco {
   id_funcionario int [ref: - Funcionario.id, note: "Identificador de funcionário"]
   id_endereco int [ref: - Endereco.id, note: "Identificador de endereço"]
+  note: "Relacionamento que representa o endereço de um funcionário"
 }
 
 Table FuncionarioPessoa {
   id_funcionario int [ref: - Funcionario.id, note: "Identificador de funcionário"]
   id_pessoa int [ref: - Pessoa.id, note: "Identificador de pessoa"]
+  note: "Relacionamento que representa as identificações de uma pessoa que seja funcionário"
 }
